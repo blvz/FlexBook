@@ -104,10 +104,9 @@ package com.rubenswieringa.book {
 	 * Ruben Swieringa created this component during his internship at the Factor.e (www.tfe.nl). Thanks to those guys for allowing me to publish the source-code online!
 	 * 
 	 * @author		Ruben Swieringa
-	 * 				ruben.swieringa@gmail.com
-	 * 				www.rubenswieringa.com
-	 * 				www.rubenswieringa.com/blog
-	 * @version		1.0.1
+	 * 				and others.
+	 * 				http://github.com/rthesaint/FlexBook
+	 * @version		1.0.3
 	 * @see			PageManager PageManager
 	 * @see			Page Page
 	 * @see			BookEvent BookEvent

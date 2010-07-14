@@ -1,6 +1,6 @@
 # FlexBook #
 
-- Current Version: 1.0.2
+- Current Version: 1.0.3
 - Flex 3.5 / AS3 / Flash Player 9+
 - Date: 4th July 2007
 - Original Author: Ruben Swieringa
@@ -13,6 +13,7 @@ For demos / implementations, look at this repo:
 
 - Fixed the 'sticky-page' bug
 - Added the jumptoPage method. It's similar to the gotoPage method, but it won't do a lot of flips to reach some page.
+- Fixed the bug that, when adding a Page dynamically, the Page didn't show fold gradients.
 
 ## Known Issues / Bugs
 

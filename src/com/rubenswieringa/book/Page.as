@@ -122,11 +122,22 @@ package com.rubenswieringa.book {
 			
 			this._gradients = new Gradients(this);
 			
+			this.addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+			
 			// disable scrolling to force this Page its fold-gradient to remain in place (this issue may be addressed in future versions):
 			super.horizontalScrollPolicy	= ScrollPolicy.OFF;
 			super.verticalScrollPolicy		= ScrollPolicy.OFF;
 		}
 		
+		/**
+		 * When added to the stage (added to a Book), force the initialize and drawFoldGradient methods.
+		 * @private
+		 */
+		private function onAddedToStage(event : Event) : void {
+			this.initialize();
+			this.drawFoldGradient();
+			this.removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		}
 		
 		/**
 		 * Static style initializer. Sets default style settings for all Page instances. Executed only once.
