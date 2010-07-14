@@ -6,6 +6,9 @@
 - Original Author: Ruben Swieringa
 - Original Release Notes: <http://www.rubenswieringa.com/blog/flex-book-component-beta>
 
+For demos / implementations, look at this repo:
+<http://github.com/rthesaint/FlexBook-demos-bundle>
+
 ## Release Notes
 
 - Fixed the 'sticky-page' bug
