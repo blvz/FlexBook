@@ -1,6 +1,6 @@
 # FlexBook #
 
-- Current Version: 1.0.1
+- Current Version: 1.0.2
 - Flex 3.5 / AS3 / Flash Player 9+
 - Date: 4th July 2007
 - Original Author: Ruben Swieringa
@@ -8,12 +8,17 @@
 
 ## Release Notes
 
-- Added original source to GitHub.
-- Added README.
+- Fixed the 'sticky-page' bug
+- Added the jumptoPage method. It's similar to the gotoPage method, but it won't do a lot of flips to reach some page.
+
+## Known Issues / Bugs
+
+- For Book instances, height values greater than the height of the content may slow down the application.
+- ScrollPolicies for Page instances are disabled (the properties have been overridden and are idle in the Page class). When a Page instance is not being flipped, its fold-gradient is drawn upon a Shape instance stored within that Page its rawChildren. When scrollbars are displayed, the Shape instance will no longer be in place.
+- When a Book instance without any children is initialized a RangeError is thrown. I will look into this issue, in the meanwhile you may want to use the following workaround; Put two child Page instances in the Book instance, then (from withinin the creationComplete property of the Book instance) remove the two dummy-children by using the removeChild() method.
+- When using the jumptoPage method, the previous pages are instantly rendered before the flip. Example: You are on pages 2-3 and want to go to pages 8-9. When jumptoPage is called, the pages 6-7 will override pages 2-3, before flipping to pages 8-9.
 
 ## Credits
-
-Ruben Swieringa:
 
 - Ruben Swieringa
 For making this awesome component and releasing it to the public.

@@ -481,7 +481,7 @@ package com.rubenswieringa.book {
 				return;
 			}
 			// stop if a page corner is flipping back into position
-			if ((this._status == BookEvent.PAGEFLIP_ENDING || this._status == BookEvent.HOVER_ENDING) && !this.autoFlipActive && !this.lastFlipSucceeded){
+			if ((this._status == BookEvent.PAGEFLIP_ENDING || this._status == BookEvent.HOVER_ENDING) && !this.autoFlipActive && !this.lastFlipSucceeded && !this._status == BookEvent.PAGEFLIP_STARTED){
 				// switch back to flipping mode if the same page corner was picked up:
 				if (this.lastFlippedCorner.equals(this.getCurrentCorner()) && this.sideFlipActive == this.isPageSideHit()){
 					this.stage.addEventListener(MouseEvent.MOUSE_UP, this.endPageFlip);
@@ -894,11 +894,12 @@ package com.rubenswieringa.book {
 		
 		
 		/**
-		 * Performs a pageflip without the user having to drag the pagecorner.
+		 * Performs a pageflip (or multiple flips) without the user having to drag the pagecorner.
 		 * 
 		 * @param	page		int/uint or Page, indicating the index or instance of a Page.
 		 * @param	cancelable	Indicates whether or not this auto-flip should allow cancelGotoPage to be called.
 		 * 
+		 * @see		Book#jumptoPage()
 		 * @see		Book#cancelGotoPage()
 		 * @see		Book#autoFlipDuration
 		 * 
@@ -927,12 +928,57 @@ package com.rubenswieringa.book {
 				this.startPageFlip();
 			}
 		}
+		
 		/**
-		 * Aborts a pageflip started by the gotoPage method.
+		 * Force a single pageflip to change the current page.
+		 * 
+		 * @param	page		int/uint or Page, indicating the index or instance of a Page.
+		 * @param	cancelable	Indicates whether or not this auto-flip should allow cancelGotoPage to be called.
+		 * 
+		 * @see		Book#jumptoPage()
+		 * @see		Book#cancelGotoPage()
+		 * @see		Book#autoFlipDuration
+		 * 
+		 * @throws	BookError		Gets thrown when the child parameter is not an instance of the Page class nor a int/uint.
+		 * @see		BookError#CHILD_NOT_PAGE
+		 * 
+		 * @throws	ArgumentsError	Gets thrown when the child parameter is not a child of this Book.
+		 * @see		BookError#PAGE_NOT_CHILD
+		 * 
+		 */
+		public function jumptoPage(page:*, cancelable:Boolean=true):void {
+
+			page = this.getPageIndex(page, true);
+			if (page%2 != 1 && page != -1) page -= 1;
+			
+			// return if we’re already at the specified Page:
+			if (this._currentPage == page) {
+				return;
+			}
+			
+			// set target index and start pageflip:
+			this.autoFlipIndex = page;
+			this.autoFlipCancelable = cancelable;
+			
+			// set _currentPage before / after the page we want to get to,
+			// according to currentPage position
+			var prePage:int = (this._currentPage < page) ? page - 2 : page + 2;
+			
+			this._currentPage = prePage;
+			
+			if (!this.autoFlipActive) {
+				this.autoFlipActive = true;
+				this.startPageFlip();
+			}
+		}
+		
+		/**
+		 * Aborts a pageflip started by the gotoPage method or the jumptoPage method.
 		 * 
 		 * @param	finishFlip	Boolean indicating whether or not to allow the auto-flip to finish. When true, the pageflip will finish. When false, the auto-flip will immediately stop, and the page corner will start sticking to the mouse.
 		 * 
 		 * @see		Book#gotoPage()
+		 * @see		Book#jumptoPage()
 		 * 
 		 */
 		public function cancelGotoPage (finishFlip:Boolean=true):void {
