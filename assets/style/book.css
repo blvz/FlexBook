@@ -1,0 +1,43 @@
+
+TextArea {
+	fontFamily: 'Trebuchet MS';
+	fontSize: 13;
+}
+
+Button.book {
+	cornerRadius: 24;
+	paddingLeft: 0; paddingRight: 0; paddingTop: 0; paddingBottom: 0;
+	highlightAlphas: 0.3, 0.1;
+	fillAlphas: 0, 0.4, 0.1, 0.5;
+	fillColors: #ffffff, #ffffff, #ffffff, #eeeeee;
+	color: #ffffff;
+	textRollOverColor: #ffffff;
+	textSelectedColor: #ffffff;
+	borderColor: #eeeeee;
+	themeColor: #eeeeee;
+	fontFamily: 'Trebuchet MS';
+	fontSize: 13;
+	fontWeight: normal;
+}
+
+LinkButton.index {
+	cornerRadius: 0;
+	rollOverColor: #e9efe9;
+	selectionColor: #ffffff;
+	color: #e1eae1;
+	textRollOverColor: #2b333c;
+	textSelectedColor: #2b333c;
+	fontFamily: 'Trebuchet MS';
+	fontSize: 12;
+}
+
+LinkButton.URL {
+	cornerRadius: 13;
+	rollOverColor: #e9efe9;
+	selectionColor: #ffffff;
+	color: #e1eae1;
+	textRollOverColor: #2b333c;
+	textSelectedColor: #2b333c;
+	fontFamily: 'Trebuchet MS';
+	fontSize: 13;
+}

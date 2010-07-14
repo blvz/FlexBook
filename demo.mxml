@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:filters="flash.filters.*"
+	xmlns:rs="com.rubenswieringa.book.*"
+	layout="absolute" 
+	backgroundColor="#333333" 
+	creationComplete="onCreationComplete()" 
+	viewSourceURL="source/index.html">
+	
+	<mx:Style source="assets/style/book.css" />
+	
+	<mx:Script>
+		<![CDATA[
+			
+			import mx.effects.Fade;
+			import com.rubenswieringa.book.*;
+			
+			[Embed(source='assets/style/icons/hard1.swf')]
+			private var hardBtnIcon1:Class;
+			[Embed(source='assets/style/icons/hard2.swf')]
+			private var hardBtnIcon2:Class;
+			
+[Bindable]	private var tearBtnVisible:Boolean = false;
+[Bindable]	private var hardBtnIcon:Class = hardBtnIcon1;
+			
+[Bindable]	private var introText1:String = "The Book component is a feature-rich container class that creates an animated, interactive book from its contents. Flip through the next pages to learn about its features.<br /><br />This component was developed by Ruben Swieringa:";
+[Bindable]	private var introText2:String = "Many thanks go out to Theo Aartsma for letting me use his artwork for this demo, thanks man. Go check out his brand-new website:";
+[Bindable]	private var transparencyText:String = "The Book component supports transparent pages.\nFlip over the next two pages and notice that they only carry the color of the above image.";
+[Bindable]	private var tearingText:String = "Every page has a tear-property which can be set to true. Tear off this page by dragging the outer top corner to the bottom, or the outer bottom corner to the top.";
+[Bindable]	private var gotoPageText:String = "The gotoPage method lets you trigger a page-flip sequence by setting a target-page.";
+[Bindable]	private var hardText:String = "The hard-property of a page can be set to true to make that page hard-back.<br /><br />Furthermore, the Book component has a hardCover-property which can be set to true to make the first and last pages hard-back.";
+[Bindable]	private var liveBitmappingText:String = "Each page has a liveBitmapping feature that (when enabled) continuously updates its cached bitmap during pageflips. Notice how the animation on this page keeps playing during a pageflip.";
+[Bindable]	private var eventsText1:String = "The Book component broadcasts a range of events, featuring:";
+[Bindable]	private var eventsText2:String = "pageflipStarted<br />pageflipEnding<br />pageflipFinished<br />hoverStarted<br />hoverEnding<br />hoverFinished<br />pageTurned<br />pageNotTurned<br />pageTorn<br />bookOpened<br />bookClosed<br />statusChanged<br />contentChanged";
+			
+			private function onCreationComplete ():void {
+				myBook.addEventListener(BookEvent.PAGE_TORN, onPageTorn);
+			}
+			
+			private function onPageTorn (event:BookEvent):void {
+				if (myBook.pages.getItemIndex(tearablePage1) == -1){
+					tearBtnVisible = true;
+				}
+			}
+			
+		 	private function addTearable ():void {
+				myBook.addChildAt(tearablePage2, 10);
+				myBook.addChildAt(tearablePage1, 10);
+			}
+			
+			private function toggleHard (page:Page):void {
+				hard_btn.toolTip = (page.hard) ? "make next page hard" : "make next page fluid";
+				hardBtnIcon = (page.hard) ? hardBtnIcon1 : hardBtnIcon2;
+				page.hard = !page.hard;
+				hard_btn.invalidateDisplayList();
+			}
+			
+		]]>
+	</mx:Script>
+	
+	
+	<!-- BOOK STARTS HERE -->
+	
+	<rs:Book id="myBook" x="{Math.round(Application.application.width/2-400)}" y="50" width="800" height="530" 
+		openAt="0" autoFlipDuration="600" easing="0.7" regionSize="150"
+		sideFlip="true" hardCover="true" hover="true" snap="false" flipOnClick="true">
+		
+		
+		<rs:Page>
+			<mx:Image source="@Embed('assets/img/sumeco/dreamscan.jpg')" />
+			<mx:Label 
+				x="343" y="38" 
+				fontFamily="Verdana" fontSize="9" color="#466C64" 
+				text="beta2" />
+			<mx:Label 
+				left="30" right="30" y="90" 
+				fontFamily="Arial" fontSize="10" color="#9BBFBA" textAlign="center"
+				text="by Ruben Swieringa" />
+		</rs:Page>
+		
+		<rs:Page>
+			<mx:Image source="@Embed('assets/img/sumeco/renaissance.jpg')" />
+			<mx:VBox left="33" right="33" top="300" bottom="33" verticalGap="0" horizontalAlign="right">
+				<mx:LinkButton styleName="index" label="transparency" click="myBook.gotoPage(transparencyPage)" />
+				<mx:LinkButton styleName="index" label="tearing" click="myBook.gotoPage(beforeTearPage)" />
+				<mx:LinkButton styleName="index" label="gotoPage()" click="myBook.gotoPage(gotoPage)" />
+				<mx:LinkButton styleName="index" label="liveBitmapping" click="myBook.gotoPage(animatedPage)" />
+				<mx:LinkButton styleName="index" label="hard-back" click="myBook.gotoPage(hardPage1)" />
+				<mx:LinkButton styleName="index" label="events" click="myBook.gotoPage(eventsPage)" />
+			</mx:VBox>
+		</rs:Page>
+		<rs:Page>
+			<mx:Image source="@Embed('assets/img/sumeco/renaissance_zoom.jpg')" />
+			<mx:VBox left="33" right="33" top="33" bottom="33" verticalGap="0">
+				<mx:TextArea 
+					width="100%" height="135" 
+					color="#E1EAE1" textAlign="left"
+					backgroundAlpha="0" borderStyle="none" 
+					editable="false" selectable="false"
+					htmlText="{introText1}" />
+				<mx:LinkButton styleName="URL" label="rubenswieringa.com/blog" click="navigateToURL(new URLRequest('http://www.rubenswieringa.com/blog'), '_blank')" />
+				<mx:LinkButton styleName="URL" label="rubenswieringa.com/portfolio" click="navigateToURL(new URLRequest('http://www.rubenswieringa.com/portfolio'), '_blank')" />
+				<mx:LinkButton styleName="URL" label="ruben.swieringa@gmail.com" enabled="false" buttonMode="false" />
+				<mx:Spacer height="33" />
+				<mx:TextArea 
+					width="100%" height="85" 
+					color="#E1EAE1" textAlign="left" 
+					backgroundAlpha="0" borderStyle="none" 
+					editable="false" selectable="false" 
+					htmlText="{introText2}" />
+				<mx:LinkButton styleName="URL" label="www.sumeco.net" click="navigateToURL(new URLRequest('http://www.sumeco.net'), '_blank')" />
+				<mx:Spacer height="100%" />
+				<mx:TextArea 
+					width="100%" height="50" 
+					color="#E1EAE1" textAlign="left"
+					backgroundAlpha="0" borderStyle="none" 
+					editable="false" selectable="false"
+					htmlText="Please bear in mind that this is a beta release, performance may not be optimal." />
+			</mx:VBox>
+		</rs:Page>
+		
+		<rs:Page id="transparencyPage"><mx:Image source="@Embed('assets/img/sumeco/hollywood.jpg')" /></rs:Page>
+		<rs:Page backgroundAlpha="0"><mx:Image source="@Embed('assets/img/sumeco/backstabber_blue1.png')" /></rs:Page>
+		<rs:Page backgroundAlpha="0"><mx:Image source="@Embed('assets/img/sumeco/backstabber_blue2.png')" /></rs:Page>
+		<rs:Page backgroundAlpha="0"><mx:Image source="@Embed('assets/img/sumeco/backstabber_green1.png')" /></rs:Page>
+		<rs:Page backgroundAlpha="0"><mx:Image source="@Embed('assets/img/sumeco/backstabber_green2.png')" /></rs:Page>
+		<rs:Page>
+			<mx:Image source="@Embed('assets/img/sumeco/backstabber.jpg')" />
+			<mx:TextArea 
+				left="130" right="40" top="350" bottom="40" 
+				fontSize="12" color="#B61B30" textAlign="right"
+				backgroundAlpha="0" borderStyle="none" 
+				editable="false" selectable="false" 
+				text="{transparencyText}" />
+		</rs:Page>
+		
+		<rs:Page id="beforeTearPage">
+			<mx:Image source="@Embed('assets/img/sumeco/mother1.jpg')" />
+			<mx:Button 
+				id="tear_btn1" styleName="book" 
+				toolTip="add tearable page" 
+				x="176" y="450" height="48" width="48"
+				hideEffect="{Fade}" showEffect="{Fade}"
+				icon="@Embed(source='assets/style/icons/addtearable.swf')" 
+				alpha="0.8" rollOver="{tear_btn1.alpha=1}" rollOut="{tear_btn1.alpha=0.8}" 
+				visible="{tearBtnVisible}" click="addTearable();tearBtnVisible=false;">
+				<mx:filters><filters:GlowFilter color="#FFFFFF" alpha="0.5"/></mx:filters>
+			</mx:Button>
+		</rs:Page>
+		<rs:Page id="tearablePage1" tearable="true"><mx:Image source="@Embed('assets/img/sumeco/relation1.jpg')" />
+			<mx:TextArea 
+				left="45" right="30" y="55" height="100" 
+				color="#dfad49" 
+				backgroundAlpha="0" borderStyle="none" 
+				editable="false" selectable="false" 
+				text="{tearingText}" />
+		</rs:Page>
+		<rs:Page id="tearablePage2" tearable="true"><mx:Image source="@Embed('assets/img/sumeco/relation2.jpg')" />
+			<mx:TextArea 
+				left="30" right="45" y="55" height="100" 
+				color="#dfad49" textAlign="right"
+				backgroundAlpha="0" borderStyle="none" 
+				editable="false" selectable="false" 
+				text="{tearingText}" />
+		</rs:Page>
+		<rs:Page>
+			<mx:Image source="@Embed('assets/img/sumeco/mother2.jpg')" />
+			<mx:Button 
+				id="tear_btn2" styleName="book" 
+				toolTip="add tearable page" 
+				x="176" y="450" height="48" width="48"
+				hideEffect="{Fade}" showEffect="{Fade}"
+				icon="@Embed(source='assets/style/icons/addtearable.swf')" 
+				alpha="0.8" rollOver="{tear_btn2.alpha=1}" rollOut="{tear_btn2.alpha=0.8}" 
+				visible="{tearBtnVisible}" click="addTearable();tearBtnVisible=false;">
+				<mx:filters><filters:GlowFilter color="#FFFFFF" alpha="0.5"/></mx:filters>
+			</mx:Button>
+		</rs:Page>
+		
+		<rs:Page id="gotoPage">
+			<mx:Image source="@Embed('assets/img/sumeco/formula.jpg')" />
+			<mx:TextArea 
+				x="75" y="330" width="175" height="200"
+				fontSize="14" color="#E5F6F7" textAlign="left" 
+				backgroundAlpha="0" borderStyle="none" 
+				editable="false" selectable="false" 
+				htmlText="{gotoPageText}" />
+			<mx:Button 
+				id="gotopage_btn" styleName="book" 
+				toolTip="flip to next page" 
+				x="285" y="350" height="48" width="48"
+				icon="@Embed(source='assets/style/icons/gotopage.swf')" 
+				alpha="0.8" rollOver="{gotopage_btn.alpha=1}" rollOut="{gotopage_btn.alpha=0.8}" 
+				click="myBook.gotoPage(myBook.currentPage+2)">
+				<mx:filters><filters:GlowFilter color="#FFFFFF" alpha="0.5"/></mx:filters>
+			</mx:Button>
+		</rs:Page>
+		<rs:Page id="animatedPage" liveBitmapping="true">
+			<mx:Image source="@Embed('assets/img/sumeco/baken.swf')" />
+			<mx:TextArea 
+				left="21" right="21" top="400" bottom="15" 
+				color="#ffffff" textAlign="left" 
+				backgroundAlpha="0" borderStyle="none" 
+				editable="false" selectable="false" 
+				htmlText="{liveBitmappingText}" />
+		</rs:Page>
+		
+		<rs:Page>
+			<mx:Image source="@Embed('assets/img/sumeco/desktopography1.jpg')" />
+			<mx:TextArea 
+				left="7" right="225" top="115" bottom="160" 
+				color="#FCFCEC" textAlign="right" 
+				backgroundAlpha="0" borderStyle="none" 
+				editable="false" selectable="false" 
+				htmlText="{hardText}" />
+			<mx:Button 
+				id="hard_btn" styleName="book" 
+				toolTip="make next page hard" 
+				x="66" y="365" height="48" width="48"
+				icon="{hardBtnIcon}" 
+				alpha="0.8" rollOver="{hard_btn.alpha=1}" rollOut="{hard_btn.alpha=0.8}" 
+				click="toggleHard(hardPage1)">
+				<mx:filters><filters:GlowFilter color="#FFFFFF" alpha="0.5"/></mx:filters>
+			</mx:Button>
+		</rs:Page>
+		<rs:Page id="hardPage1"><mx:Image source="@Embed('assets/img/sumeco/mode1.jpg')" /></rs:Page>
+		<rs:Page id="hardPage2"><mx:Image source="@Embed('assets/img/sumeco/mode2.jpg')" /></rs:Page>
+		<rs:Page><mx:Image source="@Embed('assets/img/sumeco/desktopography2.jpg')" /></rs:Page>
+		
+		<rs:Page id="eventsPage">
+			<mx:Image source="@Embed('assets/img/sumeco/ontwerpje1.jpg')" />
+			<mx:VBox left="50" right="122" top="100" bottom="40">
+				<mx:TextArea 
+					width="100%" height="66" 
+					color="#E7EDCD" textAlign="left" 
+					backgroundAlpha="0" borderStyle="none" 
+					editable="false" selectable="false" 
+					htmlText="{eventsText1}" />
+				<mx:TextArea 
+					x="10" width="100%" height="100%" 
+					fontSize="12" color="#E7EDCD" textAlign="left" 
+					backgroundAlpha="0" borderStyle="none" 
+					editable="false" selectable="false" 
+					htmlText="{eventsText2}" />
+			</mx:VBox>
+		</rs:Page>
+		<rs:Page><mx:Image source="@Embed('assets/img/sumeco/ontwerpje2.jpg')" /></rs:Page>
+		
+		<rs:Page><mx:Image source="@Embed('assets/img/sumeco/nights.jpg')" /></rs:Page>
+		
+		
+	</rs:Book>
+	
+	<!-- BOOK ENDS HERE -->
+	
+	
+</mx:Application>
