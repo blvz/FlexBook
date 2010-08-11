@@ -106,7 +106,7 @@ package com.rubenswieringa.book {
 	 * @author		Ruben Swieringa
 	 * 				and others.
 	 * 				http://github.com/rthesaint/FlexBook
-	 * @version		1.0.3
+	 * @version		1.0.4
 	 * @see			PageManager PageManager
 	 * @see			Page Page
 	 * @see			BookEvent BookEvent

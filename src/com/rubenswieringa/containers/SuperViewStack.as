@@ -24,7 +24,7 @@ package com.rubenswieringa.containers {
 	 * @author		Ruben Swieringa
 	 * 				ruben.swieringa@gmail.com
 	 * 				www.rubenswieringa.com
-	 * @version		1.0.3
+	 * @version		1.0.4
 	 * @see			mx.containers.ViewStack
 	 * 
 	 * 
@@ -480,6 +480,9 @@ package com.rubenswieringa.containers {
 		 * @see		mx.containers.ViewStack#selectedChild
 		 */
 		public function get selectedChild ():Container {
+			if (this.numChildren == 0)
+				return null;
+			
 			return super.getChildAt(this._selectedIndex) as Container;
 		}
 		public function set selectedChild (child:Container):void {
