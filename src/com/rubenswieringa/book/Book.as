@@ -106,7 +106,7 @@ package com.rubenswieringa.book {
 	 * @author		Ruben Swieringa
 	 * 				and others.
 	 * 				http://github.com/rthesaint/FlexBook
-	 * @version		1.0.4
+	 * @version		1.0.5
 	 * @see			PageManager PageManager
 	 * @see			Page Page
 	 * @see			BookEvent BookEvent
@@ -260,6 +260,9 @@ package com.rubenswieringa.book {
 		 * @private
 		 */
 		protected var regions:Array = [];
+		
+		protected var _tempCurrentPage : int = -2;
+		protected var _jumpIndex : int = -2;
 		
 		// internals for accessors:
 		/**
@@ -428,7 +431,6 @@ package com.rubenswieringa.book {
 		override public function swapChildren (child1:DisplayObject, child2:DisplayObject):void {
 			super.swapChildren(child1, child2);
 			var children:Array = [];
-			var page:Page;
 			if (child1 is Page) children.push(child1);
 			if (child2 is Page) children.push(child2);
 			for (var i:int=0; i<children.length; i++){
@@ -462,7 +464,7 @@ package com.rubenswieringa.book {
 				return;
 			}
 			// if the Book was clicked and gotoPage is active then attempt to abort gotoPage:
-			if (this.autoFlipActive && !this.tearActive && this.pageCorner.x >= 0 && this.pageCorner.x <= this.width/2 && event != null){
+			if (this.autoFlipActive && !this.tearActive && this.pageCorner.x >= 0 && this.pageCorner.x <= this.width/2 && event != null && this.flipOnClick) {
 				this.cancelGotoPage(false);
 				return;
 			}
@@ -519,8 +521,8 @@ package com.rubenswieringa.book {
 			this.sideFlipActive			= (!this.tearActive && this.sideFlip && this.isPageSideHit());
 			this.render.x = this.lastFlippedSide * this.width/2;
 			
-			// specify front and flipside indexes:
-			var frontIndex:uint	= this._currentPage + this.lastFlippedSide;
+			// specify front and flipside indexes (_tempCurrentPage is used on jumpToPage):
+			var frontIndex:uint	= (_tempCurrentPage < -1 ? this._currentPage : _tempCurrentPage) + this.lastFlippedSide;
 			var backIndex:uint	= this._currentPage + this.lastFlippedSide + this.lastFlippedDirection;
 			// save bitmapData:
 			this.saveBitmapData(Page(this._pages.getItemAt(frontIndex)), Page(this._pages.getItemAt(backIndex)));
@@ -605,8 +607,8 @@ package com.rubenswieringa.book {
 				return;
 			}
 			
-			// specify front and flipside indexes:
-			var frontIndex:uint	= this._currentPage + this.lastFlippedSide;
+			// specify front and flipside indexes (_tempCurrentPage is used on jumpToPage):
+			var frontIndex:uint	= (_tempCurrentPage < -1 ? this._currentPage : _tempCurrentPage) + this.lastFlippedSide;
 			var backIndex:uint	= this._currentPage + this.lastFlippedSide + this.lastFlippedDirection;
 			var front:Page	= Page(this._pages.getItemAt(frontIndex));
 			var back:Page	= Page(this._pages.getItemAt(backIndex));
@@ -626,8 +628,8 @@ package com.rubenswieringa.book {
 														1);
 				PageFlip.drawBitmapSheet   (ocf,
 											this.render,
-											this.bitmapData[frontIndex],
-											this.bitmapData[backIndex]);
+											this.bitmapData[0],
+											this.bitmapData[1]);
 				// add shadows or highlights to the render:
 				this.addSmoothGradients(ocf);
 				// take ocf and find out whether we should start tearing this Page off:
@@ -635,8 +637,8 @@ package com.rubenswieringa.book {
 					this.evaluateTear(ocf.cPoints[2].clone());
 				}
 			}else{
-				this.drawHardPage  (this.bitmapData[frontIndex],
-									this.bitmapData[backIndex]);
+				this.drawHardPage  (this.bitmapData[0],
+									this.bitmapData[1]);
 			}
 			
 			
@@ -763,7 +765,12 @@ package com.rubenswieringa.book {
 					if (this._currentPage == this.autoFlipIndex){
 						this.autoFlipActive = false;
 					}else{
-						this.startPageFlip();
+						if (_jumpIndex >= -1) {
+							this.autoFlipActive = false;
+							this.jumpToPage(_jumpIndex);
+						} else {
+							this.startPageFlip();
+						}
 					}
 				}
 			}
@@ -772,9 +779,9 @@ package com.rubenswieringa.book {
 			this.hoverActive = false;
 			this.sideFlipActive = false;
 			this.tearActive = false;
-			
+			_tempCurrentPage = -2;
 		}
-		
+
 		
 		/**
 		 * Draws a hardcover Page, similar to the drawBitmapSheet method of the PageFlip class.
@@ -817,7 +824,7 @@ package com.rubenswieringa.book {
 			p[3] = (pPoints[2].x < pPoints[3].x) ? pPoints[2] : pPoints[3];
 			
 			// draw page:
-			var bmd:BitmapData
+			var bmd:BitmapData;
 			if (this.lastFlippedSide == 0){
 				bmd = (this.pageCorner.x > this.width/2) ? back : front;
 			}else{
@@ -945,7 +952,7 @@ package com.rubenswieringa.book {
 		 * @see		BookError#PAGE_NOT_CHILD
 		 * 
 		 */
-		public function jumptoPage(page:*, cancelable:Boolean=true):void {
+		public function jumpToPage(page:*, cancelable:Boolean=true):void {
 
 			page = this.getPageIndex(page, true);
 			if (page%2 != 1 && page != -1) page -= 1;
@@ -959,10 +966,22 @@ package com.rubenswieringa.book {
 			this.autoFlipIndex = page;
 			this.autoFlipCancelable = cancelable;
 			
+			if (Math.abs(_currentPage - page) == 1) {
+				gotoPage(page, cancelable);
+				return;
+			}
+			
+			if (autoFlipActive) {
+				_jumpIndex = page;
+				return;
+			}
+			_jumpIndex = -2;
+			
 			// set _currentPage before / after the page we want to get to,
 			// according to currentPage position
 			var prePage:int = (this._currentPage < page) ? page - 2 : page + 2;
 			
+			_tempCurrentPage = _currentPage;
 			this._currentPage = prePage;
 			
 			if (!this.autoFlipActive) {
@@ -1261,8 +1280,8 @@ package com.rubenswieringa.book {
 		protected function saveBitmapData (front:Page, back:Page):void {
 			back.hideFoldGradient();
 			this.bitmapData = []; // dispose of BitmapData of pages we won't need right now
-			this.bitmapData[front.index] =	front.getBitmapData();
-			this.bitmapData[back.index]	=	back.getBitmapData();
+			this.bitmapData[0] = front.getBitmapData();
+			this.bitmapData[1] = back.getBitmapData();
 			back.showFoldGradient();
 		}
 		
@@ -1529,7 +1548,7 @@ package com.rubenswieringa.book {
 		 * @default	150
 		 */
 		public function get regionSize ():uint {
-			return this._regionSize
+			return this._regionSize;
 		}
 		public function set regionSize (value:uint):void {
 			this._regionSize = value;
@@ -1566,7 +1585,7 @@ package com.rubenswieringa.book {
 													(this.height-this._regionSize)/2,
 													this._regionSize/2,
 													this._regionSize);
-			this.regions[1].side = this.regions[0].side.clone()
+			this.regions[1].side = this.regions[0].side.clone();
 			this.regions[0].side.x = this.width-this._regionSize/2;
 		}
 		
