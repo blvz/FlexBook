@@ -7,7 +7,7 @@
 - Original Release Notes: <http://www.rubenswieringa.com/blog/flex-book-component-beta>
 
 For demos / implementations, look at this repo:
-<http://github.com/blvs/FlexBook-demos-bundle>
+<http://github.com/blvz/FlexBook-demos-bundle>
 
 ## Release Notes
 
